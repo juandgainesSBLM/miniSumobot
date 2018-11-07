@@ -1,6 +1,6 @@
 #include <HCSR04.h>
 
-UltraSonicDistanceSensor distanceSensor(13, 12);  // Initialize sensor that uses digital pins 13 and 12.
+UltraSonicDistanceSensor distanceSensor(12, 11);  // Initialize sensor that uses digital pins 13 and 12.
 
 int distance;
 
