@@ -1,3 +1,14 @@
+#include <HCSR04.h>
+
+#define SURVIVE 0
+#define HUNT 1
+#define TARGET 2
+#define ATTACK 3
+
+#define SHARP_THRESHOLD 300
+
+
+UltraSonicDistanceSensor distanceSensor(12, 11);
 /*
  Codigo para un robot Minisumo con 2 sensores sharp y 2 sensores QTR  
  */
@@ -16,6 +27,7 @@ int Sder = 0;
 
 int Qder = 0;
 int Qizq = 0;
+int distance=0;
 
 //Declaracion de pines para los motores
 
@@ -29,21 +41,20 @@ int Bin1=6;
 int Bin2=7;
 int PwmRight=9;
 
-int Mder1 = 4;
-int Mder2 = 5;
+int Led = 13;
+int StateVariable=TARGET;
 
-int Mizq1 = 6;
-int Mizq2 = 7;
-
-
-int Led = 8;
+char rotation='n';
 
 void setup() {                
   
-   pinMode(Mder1, OUTPUT);     
-   pinMode(Mder2, OUTPUT); 
-   pinMode(Mizq1, OUTPUT);
-   pinMode(Mizq2, OUTPUT); 
+   pinMode(Ain1, OUTPUT);     
+   pinMode(Ain2, OUTPUT); 
+   pinMode(Bin1, OUTPUT);
+   pinMode(Bin2, OUTPUT);
+   pinMode(PwmLeft, OUTPUT);
+   pinMode(PwmRight, OUTPUT);
+    
    pinMode(Led, OUTPUT); 
    digitalWrite(Led, HIGH);   // set the LED on
    delay(5000);  // Tiempo de Seguriadad
@@ -51,19 +62,109 @@ void setup() {
 
 void loop() {
   sensores();
-  // Estos valores de 300 pueden cambiar dependiendo de cada sensor, cuando es menor a 300 se refiere a que no detecta nada, y mayor a 300 es que el sensor esta detectando algo
-  // sin embargo eso lo debes comprobar tu mismo con tus sensores.
-  if((Sizq<=300)&&(Sder<=300)){derechasuave();}   // 0 0 0 0=> elegir entre ir adelante o dar vueltas
-  if((Sizq<=300)&&(Sder<=300)){derechafuerte();}  // 0 0 0 1
-  if((SLadoizq<=300)&&(Sizq<=300)&&(Sder>=300)&&(SLadoder<=300)){derechasuave();}   // 0 0 1 0
-  if((SLadoizq<=300)&&(Sizq>=300)&&(Sder<=300)&&(SLadoder<=300)){izquierdasuave();} // 0 1 0 0
-  if((SLadoizq<=300)&&(Sizq>=300)&&(Sder>=300)&&(SLadoder<=300)){adelante();}       // 0 1 1 0
-  if((SLadoizq>=300)&&(Sizq<=300)&&(Sder<=300)&&(SLadoder<=300)){izquierdafuerte();}// 1 0 0 0 
-  
-  //Para los sensores QTR los valores menores a 500 indican que detecto la liena blanca, por lo que si cualquiera de los 2 sensores detecta la linea blanca el robot debe regresar
-  // Tu decides si quieres que solo regrese o tambien quieres que gire a la derecha o izquierda
-  
-  if((Qder<=500)||(Qizq<=500)){atras();delay(200);}   //el tiempo del delay depende de que tan rapido sea tu robot
+    switch(StateVariable){
+      
+      case SURVIVE:
+
+          
+          if(Qder == 1 && Qizq==1){
+            //Add the actions
+            
+            }
+          else if (Qder == 1 && Qizq==0){
+            //Add the actions
+            
+           }
+
+          else if (Qder == 0 && Qizq==1){
+            //Add the actions
+            
+          }
+          else if (Qder == 0 && Qizq==0){
+            //Add the actions
+
+            
+          }
+          
+          StateVariable=HUNT;
+          break;
+          
+      case HUNT:
+          // When edge detected change of state
+          if(Qder == 0 || Qizq==0){
+
+            // Add transition to SURVIVE state
+            break;
+          }
+          //When opponent detected to left
+          else if(Sizq<SHARP_THRESHOLD){
+            // Add actions
+            //Set the direction of roration trhough the direction variable  roration='l' or roration='r'
+            //Change state to hunt
+            
+            }
+         
+          //When opponent detected to right
+          else if(Sder<SHARP_THRESHOLD){
+            
+            // Add actions
+            //Set the direction of roration trhough the direction variable  roration='l' or roration='r'
+            //Change state to hunt
+            
+            }
+
+          else{
+            // Add actions
+            // Arcing movement to the right or left
+          }
+
+          
+          break;
+      case TARGET:
+
+          // When edge detected change of state
+          if(Qder == 0 || Qizq==0){
+
+            // Add transition to SURVIVE state
+            break;
+          }
+
+          if (rotation== 'l'){
+              izquierda(1);
+             if(distance!=0 ){
+              
+              //go to attack state
+              rotation='n';
+              }
+             
+            }
+          else if(rotation=='r'){
+            derecha(1);
+             if(distance!=0 ){
+              
+              //go to attack state
+              rotation='n';
+              }
+            }
+
+           
+          
+          
+          break;
+      case ATTACK:
+            // adjust speedSumo to 255speed
+            //Go forward
+            
+            if(Qder == 0 || Qizq==0){
+
+            // Add transition to SURVIVE state
+
+            speedSumo=200;
+            
+            }
+      
+          break;
+      }
   
 }
 
@@ -73,7 +174,9 @@ void sensores (){
  Sder = analogRead(SharpDer);  
  Sizq = analogRead(SharpIzq); 
  Qder = analogRead(QtrDer); 
- Qizq = analogRead(QtrIzq); 
+ Qizq = analogRead(QtrIzq);
+ distance=distanceSensor.measureDistanceCm();
+  
  delay(1);   
 }
 
@@ -110,7 +213,7 @@ analogWrite(PwmRight,speedSumo);
 digitalWrite(Ain2, HIGH);
 digitalWrite(Ain1, LOW);
 analogWrite(PwmLeft,speedSumo);
-delay(secondTurn*1000);
+delay(secondTurn);
 parar();
 }
 void izquierda(int secondTurn){
@@ -120,7 +223,8 @@ analogWrite(PwmRight,speedSumo);
 digitalWrite(Ain2, LOW);
 digitalWrite(Ain1, HIGH);
 analogWrite(PwmLeft,speedSumo);
-delay(secondTurn*1000);
+delay(secondTurn);
+parar();
 }
 void derechaArc(){
 digitalWrite(Bin1, LOW);
@@ -129,18 +233,12 @@ analogWrite(PwmRight,150);
 digitalWrite(Ain2, HIGH);
 digitalWrite(Ain1, LOW);
 analogWrite(PwmLeft,200);
-delay(secondTurn*1000);
-parar();
 }
-void izquierdaArc(int secondTurn){
+void izquierdaArc(){
 digitalWrite(Bin1, HIGH);
 digitalWrite(Bin2,LOW);
 analogWrite(PwmRight,200);
 digitalWrite(Ain2, LOW);
 digitalWrite(Ain1, HIGH);
-analogWrite(PwmLeft,1150);
-delay(secondTurn*1000);
+analogWrite(PwmLeft,150);
 }
-
-
-
