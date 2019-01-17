@@ -1,29 +1,37 @@
 /*
- Codigo para un robot Minisumo con 2 sensores sharp y 2 sensores QTR
- By Jason Salazar
-  
+ Codigo para un robot Minisumo con 2 sensores sharp y 2 sensores QTR  
  */
-
+int speedSumo=200;
 //Declaracion de pines para sensores
-int SharpDer = A0; 
-int SharpIzq = A1; 
-int QtrDer   = A2;
-int QtrIzq   = A3;
-int SharpladoDer = A4; 
-int SharpladoIzq = A5; 
+int SharpDer = A1; 
+int SharpIzq = A0;
+int QtrDer   = 3;
+int QtrIzq   =2;
+
 
 
 //Declaracion de variables para leer los valores de los sensores
 int Sizq = 0;
 int Sder = 0;
-int SLadoizq = 0;
-int SLadoder = 0;
+
 int Qder = 0;
 int Qizq = 0;
 
 //Declaracion de pines para los motores
+
+//Left motor
+int Ain1=5;
+int Ain2=4;
+int PwmLeft=10;
+
+//Right Motor
+int Bin1=6;
+int Bin2=7;
+int PwmRight=9;
+
 int Mder1 = 4;
 int Mder2 = 5;
+
 int Mizq1 = 6;
 int Mizq2 = 7;
 
@@ -45,8 +53,8 @@ void loop() {
   sensores();
   // Estos valores de 300 pueden cambiar dependiendo de cada sensor, cuando es menor a 300 se refiere a que no detecta nada, y mayor a 300 es que el sensor esta detectando algo
   // sin embargo eso lo debes comprobar tu mismo con tus sensores.
-  if((SLadoizq<=300)&&(Sizq<=300)&&(Sder<=300)&&(SLadoder<=300)){derechasuave();}   // 0 0 0 0=> elegir entre ir adelante o dar vueltas
-  if((SLadoizq<=300)&&(Sizq<=300)&&(Sder<=300)&&(SLadoder>=300)){derechafuerte();}  // 0 0 0 1
+  if((Sizq<=300)&&(Sder<=300)){derechasuave();}   // 0 0 0 0=> elegir entre ir adelante o dar vueltas
+  if((Sizq<=300)&&(Sder<=300)){derechafuerte();}  // 0 0 0 1
   if((SLadoizq<=300)&&(Sizq<=300)&&(Sder>=300)&&(SLadoder<=300)){derechasuave();}   // 0 0 1 0
   if((SLadoizq<=300)&&(Sizq>=300)&&(Sder<=300)&&(SLadoder<=300)){izquierdasuave();} // 0 1 0 0
   if((SLadoizq<=300)&&(Sizq>=300)&&(Sder>=300)&&(SLadoder<=300)){adelante();}       // 0 1 1 0
@@ -62,63 +70,77 @@ void loop() {
 
 // Lectura de Sensores
 void sensores (){
- Sder = analogRead(SharpDer); 
- delay(1);   
+ Sder = analogRead(SharpDer);  
  Sizq = analogRead(SharpIzq); 
- delay(1);   
- SLadoder = analogRead(SharpladoDer); 
- delay(1);   
- SLadoizq = analogRead(SharpladoIzq); 
- delay(1); 
- 
  Qder = analogRead(QtrDer); 
- delay(1);   
  Qizq = analogRead(QtrIzq); 
  delay(1);   
 }
 
 void adelante(){
-digitalWrite(Mder1, HIGH);
-digitalWrite(Mder2, LOW);
-digitalWrite(Mizq1, HIGH);
-digitalWrite(Mizq2, LOW);
+digitalWrite(Bin1, HIGH);
+digitalWrite(Bin2,LOW);
+analogWrite(PwmRight,speedSumo);
+digitalWrite(Ain2, HIGH);
+digitalWrite(Ain1, LOW);
+analogWrite(PwmLeft,speedSumo);
 }
+
 void atras(){
-digitalWrite(Mder1, LOW);
-digitalWrite(Mder2, HIGH);
-digitalWrite(Mizq1, LOW);
-digitalWrite(Mizq2, HIGH);
+digitalWrite(Bin1, LOW);
+digitalWrite(Bin2,HIGH);
+analogWrite(PwmRight,speedSumo);
+digitalWrite(Ain2, LOW);
+digitalWrite(Ain1, HIGH);
+analogWrite(PwmLeft,speedSumo);
 }
 void parar(){
-digitalWrite(Mder1, LOW);
-digitalWrite(Mder2, LOW);
-digitalWrite(Mizq1, LOW);
-digitalWrite(Mizq2, LOW);
+digitalWrite(Bin1, LOW);
+digitalWrite(Bin2,LOW);
+analogWrite(PwmRight,speedSumo);
+digitalWrite(Ain2, LOW);
+digitalWrite(Ain1, LOW);
+analogWrite(PwmLeft,speedSumo);
 }
 
-void derechasuave(){
-digitalWrite(Mder1, LOW);
-digitalWrite(Mder2, LOW);
-digitalWrite(Mizq1, HIGH);
-digitalWrite(Mizq2, LOW);
+void derecha(int secondTurn){
+digitalWrite(Bin1, LOW);
+digitalWrite(Bin2,HIGH);
+analogWrite(PwmRight,speedSumo);
+digitalWrite(Ain2, HIGH);
+digitalWrite(Ain1, LOW);
+analogWrite(PwmLeft,speedSumo);
+delay(secondTurn*1000);
+parar();
 }
-void derechafuerte(){
-digitalWrite(Mder1, LOW);
-digitalWrite(Mder2, HIGH);
-digitalWrite(Mizq1, HIGH);
-digitalWrite(Mizq2, LOW);
+void izquierda(int secondTurn){
+digitalWrite(Bin1, HIGH);
+digitalWrite(Bin2,LOW);
+analogWrite(PwmRight,speedSumo);
+digitalWrite(Ain2, LOW);
+digitalWrite(Ain1, HIGH);
+analogWrite(PwmLeft,speedSumo);
+delay(secondTurn*1000);
+}
+void derechaArc(){
+digitalWrite(Bin1, LOW);
+digitalWrite(Bin2,HIGH);
+analogWrite(PwmRight,150);
+digitalWrite(Ain2, HIGH);
+digitalWrite(Ain1, LOW);
+analogWrite(PwmLeft,200);
+delay(secondTurn*1000);
+parar();
+}
+void izquierdaArc(int secondTurn){
+digitalWrite(Bin1, HIGH);
+digitalWrite(Bin2,LOW);
+analogWrite(PwmRight,200);
+digitalWrite(Ain2, LOW);
+digitalWrite(Ain1, HIGH);
+analogWrite(PwmLeft,1150);
+delay(secondTurn*1000);
 }
 
-void izquierdasuave(){
-digitalWrite(Mder1, HIGH);
-digitalWrite(Mder2, LOW);
-digitalWrite(Mizq1, LOW);
-digitalWrite(Mizq2, LOW);
-}
-void izquierdafuerte(){
-digitalWrite(Mder1, HIGH);
-digitalWrite(Mder2, LOW);
-digitalWrite(Mizq1, LOW);
-digitalWrite(Mizq2, HIGH);
-}
+
 
