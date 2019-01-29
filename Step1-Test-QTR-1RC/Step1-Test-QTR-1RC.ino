@@ -19,7 +19,7 @@ void loop() {
   Serial.print("Right QTR sensor:");
   Serial.print(sensor2);
   Serial.print("| Left QTR sensor:");
-  Serial.print(sensor1);
+  Serial.println(sensor1);
 
   delay(100);
 
