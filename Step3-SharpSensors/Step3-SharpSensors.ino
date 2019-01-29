@@ -14,12 +14,12 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   sensor1Sharp = analogRead(A0);
-  sensor2Sharp = digitalRead(A1);
+  sensor2Sharp = analogRead(A1);
 
   Serial.print("Right QTR sensor:");
   Serial.print(sensor2Sharp);
   Serial.print("| Left QTR sensor:");
-  Serial.print(sensor1Sharp);
+  Serial.println(sensor1Sharp);
 
   delay(100);
 
